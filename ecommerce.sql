@@ -1,0 +1,124 @@
+
+CREATE DATABASE ecommerce;
+USE ecommerce;
+
+
+CREATE TABLE product (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(240) NOT NULL,
+  description TEXT,
+  price DECIMAL(10,2) NOT NULL,
+  brand_id INT,
+  category_id INT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (brand_id) REFERENCES brand(id),
+  FOREIGN KEY (category_id) REFERENCES product_category(id)
+);
+
+CREATE TABLE product_category (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(240) NOT NULL,
+  description TEXT,
+  parent_id INT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (parent_id) REFERENCES product_category(id)
+);
+
+CREATE TABLE brand (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(250) NOT NULL,
+  description TEXT,
+  logo_url VARCHAR(520),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+
+CREATE TABLE size_category (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  description TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+CREATE TABLE size_option (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  size_category_id INT NOT NULL,
+  value VARCHAR(50) NOT NULL,
+  description VARCHAR(265),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (size_category_id) REFERENCES size_category(id)
+);
+
+
+CREATE TABLE color (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  hex_code VARCHAR(7),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+CREATE TABLE product_variation (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  product_id INT NOT NULL,
+  size_option_id INT,
+  color_id INT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (product_id) REFERENCES product(id),
+  FOREIGN KEY (size_option_id) REFERENCES size_option(id),
+  FOREIGN KEY (color_id) REFERENCES color(id)
+  
+);
+CREATE TABLE product_image (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  product_id INT NOT NULL,
+  image_url VARCHAR(500) NOT NULL,
+  alt_text VARCHAR(240),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (product_id) REFERENCES product(id) ON DELETE CASCADE
+);
+
+CREATE TABLE product_item (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  product_var_id INT NOT NULL,
+  stock_quantity INT DEFAULT 0,
+  barcode VARCHAR(100) UNIQUE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (product_var_id) REFERENCES product_variation(id) 
+);
+
+
+CREATE TABLE attribute_category (
+  category_id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(235) NOT NULL,
+  description TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+CREATE TABLE attribute_type (
+  type_id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  data_type VARCHAR(50) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+CREATE TABLE product_attribute (
+  attr_id INT AUTO_INCREMENT PRIMARY KEY,
+  product_id INT NOT NULL,
+  attr_category_id INT NOT NULL,
+  attr_type_id INT NOT NULL,
+  name VARCHAR(240) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (product_id) REFERENCES product(id),
+  FOREIGN KEY (attr_category_id) REFERENCES attr_category(id),
+  FOREIGN KEY (attr_type_id) REFERENCES attr_type(id)
+);
